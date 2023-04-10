@@ -1,19 +1,13 @@
 package org.example;
 
 public class GraphNode<T> {
-    public T data;
+    public int nodeValue=Integer.MAX_VALUE;
     public AdjacencyMatrix mat;
     public int nodeId;
     private short stationId;
     private double latitude;
     private double longitude;
     public String stationName;
-    public int nodeValue = Integer.MAX_VALUE;
-    public GraphNode(String stationName,AdjacencyMatrix mat){
-        this.stationName=stationName;
-        this.mat=mat;
-        mat.nodes[nodeId=mat.nodeCount++]=this; //Add this node to adjacency matrix and record id
-    }
 
     public GraphNode(short stationId, double latitude, double longitude, String stationName, AdjacencyMatrix mat){
         this.stationId=stationId;
@@ -24,18 +18,14 @@ public class GraphNode<T> {
         mat.nodes[nodeId=mat.nodeCount++]=this; //Add this node to adjacency matrix and record id
     }
 
-    public void connectToNodeDirected(GraphNode<T> destNode) {
-        mat.amat[nodeId][destNode.nodeId]=true;
+    public void connectToNodeDirected(GraphNode<T> destNode, int cost) {
+        mat.amat[nodeId][destNode.nodeId]=cost;
     }
 
-    public void connectToNodeUndirected(GraphNode<?> destNode) {
+    public void connectToNodeUndirected(GraphNode<?> destNode, int cost) {
         // TODO: change to use weight instead of boolean
-        mat.amat[nodeId][destNode.nodeId]=mat.amat[destNode.nodeId][nodeId]=true;
-        mat.amat[destNode.nodeId][nodeId]=mat.amat[nodeId][destNode.nodeId]=true;
-    }
-
-    public void setData(T data) {
-        this.data = data;
+        mat.amat[nodeId][destNode.nodeId]=mat.amat[destNode.nodeId][nodeId]=cost;
+        mat.amat[destNode.nodeId][nodeId]=mat.amat[nodeId][destNode.nodeId]=cost;
     }
 
     public void setMat(AdjacencyMatrix mat) {
