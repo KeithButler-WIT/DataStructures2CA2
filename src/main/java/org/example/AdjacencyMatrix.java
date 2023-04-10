@@ -7,6 +7,8 @@ public class AdjacencyMatrix {
     public GraphNode<?>[] nodes;
     public int nodeCount=0;
 
+    // TODO: change this to store the weight instead of boolean
+    // get weight from distance
     public AdjacencyMatrix(int size){
         amat = new boolean [size][size]; //All false values by default
         nodes = (GraphNode<?>[]) Array.newInstance(GraphNode.class, size);
