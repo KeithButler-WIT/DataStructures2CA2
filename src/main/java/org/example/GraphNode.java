@@ -7,7 +7,7 @@ public class GraphNode<T> {
     private short stationId;
     private double latitude;
     private double longitude;
-    public String stationName;
+    private String stationName;
 
     public GraphNode(short stationId, double latitude, double longitude, String stationName, AdjacencyMatrix mat){
         this.stationId=stationId;
@@ -23,7 +23,6 @@ public class GraphNode<T> {
     }
 
     public void connectToNodeUndirected(GraphNode<?> destNode, int cost) {
-        // TODO: change to use weight instead of boolean
         mat.amat[nodeId][destNode.nodeId]=mat.amat[destNode.nodeId][nodeId]=cost;
         mat.amat[destNode.nodeId][nodeId]=mat.amat[nodeId][destNode.nodeId]=cost;
     }
