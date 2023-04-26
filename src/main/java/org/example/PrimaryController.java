@@ -2,9 +2,10 @@ package org.example;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.opencsv.exceptions.CsvException;
 import javafx.fxml.FXML;
@@ -16,7 +17,7 @@ public class PrimaryController {
 
     @FXML
     private void initialize() {
-        AdjacencyMatrix am = new AdjacencyMatrix(310); //Room for 8 nodes (could use larger!)
+        AdjacencyMatrix am = new AdjacencyMatrix(310); //Room for 310 nodes (could use larger!)
         loadStationsCSVFile(am);
         loadLinesCSVFile(am);
         mainMenu(am);
@@ -35,7 +36,8 @@ public class PrimaryController {
                 double latitude = Double.parseDouble(nextLine[1]);
                 double longitude = Double.parseDouble(nextLine[2]);
                 String name = nextLine[3];
-                new GraphNode<>(stationId, latitude, longitude, name, am);
+                GraphNode<?> node = new GraphNode<>(stationId, latitude, longitude, name, am);
+                node.setNodeValue(Integer.MAX_VALUE);
             }
         } catch (IOException | CsvException e) {
             throw new RuntimeException(e);
@@ -78,12 +80,12 @@ public class PrimaryController {
             //TODO: uncomment scanner.nextLines()
             Scanner scanner = new Scanner(new InputStreamReader(System.in));
             System.out.println("Select a start station:");
-//            short stationId = scanner.nextShort();   // make sure it's a short
-//            String startName = scanner.nextLine();
-            String startName = "West Ruislip";
-//            System.out.println("Select a destination station:");
-//            String destName = scanner.nextLine();
-            String destName = "East Acton";
+//            String stationId = scanner.nextShort();   // make sure it's a short
+            String startName = scanner.nextLine();
+//            String startName = "West Ruislip";
+            System.out.println("Select a destination station:");
+            String destName = scanner.nextLine();
+//            String destName = "South Ruislip";
             printMainMenu();
             System.out.println("Select an option:");
             int choice = scanner.nextInt();   // make sure it's an int
@@ -123,12 +125,38 @@ public class PrimaryController {
         }
     }
     private void fewestStations(AdjacencyMatrix am, String startName, String destName) {
-        // 2. Route with the fewest stations/stops between the starting and destination stations.
-        //    (Breadth First Search)
+        Scanner scanner = new Scanner(new InputStreamReader(System.in));
+        System.out.println("Input a list of waypoints");
+        System.out.println("Leave blank to stop putting in waypoints");
+        ArrayList<String> waypointList = new ArrayList<>();
+        waypointList.add(startName); // makes the start point the first waypoint
+        String waypointName = "";
+        do {
+            System.out.println("Next waypoint:");
+            // ask the user to input waypoints if none ask for destination only
+            waypointName = scanner.nextLine();
+            waypointList.add(waypointName);
+        } while(!Objects.equals(waypointName, ""));
+
+        waypointList.remove(waypointList.size()-1);
+        waypointList.add(destName); // makes the destination the last waypoint
+
+        List<GraphNode<?>> bfsPathTotal = new ArrayList<>(Collections.emptyList());
+//        for (String waypoint : waypointList) {
+        for (int i = 0; i<waypointList.size()-1; i++) {
+            List<GraphNode<?>> bfsPath;
+//            if (i==0) {
+//                bfsPath=findPathBreadthFirst(am.getNodeFromStationName(startName),waypointList.get(i));
+//                continue;
+//            }
+            bfsPath=findPathBreadthFirst(am.getNodeFromStationName(waypointList.get(i)),waypointList.get(i+1));
+            bfsPathTotal = Stream.concat(bfsPathTotal.stream(), bfsPath.stream()).collect(Collectors.toList()); // add the currently found path to the overall list
+        }
+
+        // 2. Route with the fewest stations/stops between the starting and destination stations. (Breadth First Search)
         System.out.println("\nThe shortest solution path from " + startName + " to node containing " + destName);
         System.out.println("-----------------------------------------------------------------------------");
-        List<GraphNode<?>> bfsPath=findPathBreadthFirst(am.getNodeFromStationName(startName),destName);
-        for(GraphNode<?> n : bfsPath) System.out.println(n.getStationName());
+        for(GraphNode<?> n : bfsPathTotal) System.out.println(n.getStationName());
 
     }
     private void shortestRoute(AdjacencyMatrix am, String startName, String destName) {
@@ -214,12 +242,12 @@ public class PrimaryController {
         encountered.add(from); //Add current node to encountered list
 
         for(int i=0;i<from.mat.nodeCount;i++) {
-            if (depth>=100) continue; // stops the current path if it goes on for too long
+            if (depth>=50) continue; // stops the current path if it goes on for too long
             if (from.mat.amat[from.nodeId][i] > 0 && !encountered.contains(from.mat.nodes[i])) {
 //                System.out.println("Valid node found");
-                for (int j=0; j<depth;j++) // Adds a tab to the output depending on level of depth
-                    System.out.print("\t");
-                System.out.println(from.mat.nodes[i].getStationName());
+//                for (int j=0; j<depth;j++) // Adds a tab to the output depending on level of depth
+//                    System.out.print("\t");
+//                System.out.println(from.mat.nodes[i].getStationName());
                 temp2=findAllPathsDepthFirst(from.mat.nodes[i],new ArrayList<>(encountered),lookingFor, ++depth); //Use clone of encountered list for recursive call!
                 if(temp2!=null) { //Result of the recursive call contains one or more paths to the solution node
 //                    if (temp2.size() >= 100) continue;
@@ -241,7 +269,9 @@ public class PrimaryController {
         firstAgendaPath.add(startNode);
         agenda.add(firstAgendaPath);
         resultPath=findPathBreadthFirst(agenda,null,lookingFor); //Get single BFS path (will be shortest)
-        Collections.reverse(resultPath); //Reverse path (currently has the goal node as the first item)
+        if (resultPath != null) {
+            Collections.reverse(resultPath); //Reverse path (currently has the goal node as the first item)
+        }
         return resultPath;
     }
     // Agenda list based breadth-first graph search returning a single reversed path (tail recursive)
@@ -271,24 +301,25 @@ public class PrimaryController {
     public static <T> CostedPath findCheapestPathDijkstra(GraphNode<?> startNode, String lookingFor){
         CostedPath cp=new CostedPath(); //Create result object for cheapest path
         List<GraphNode<?>> encountered=new ArrayList<>(), unencountered=new ArrayList<>(); //Create encountered/unencountered lists
-        startNode.nodeValue=0; //Set the starting node value to zero
+        startNode.setNodeValue(0); //Set the starting node value to zero
         unencountered.add(startNode); //Add the start node as the only value in the unencountered list to start
         GraphNode<?> currentNode;
         do{ //Loop until unencountered list is empty
-            currentNode=unencountered.remove(0); //Get the first unencountered node (sorted list, so will have lowest value)
+            currentNode=unencountered.remove(0); //Get the first unencountered node (sorted list, so will have the lowest value)
             encountered.add(currentNode); //Record current node in encountered list
             if(currentNode.getStationName().equals(lookingFor)){ //Found goal - assemble path list back to start and return it
-                System.out.println("found goal");
+//                System.out.println("found goal");
                 cp.pathList.add(currentNode); //Add the current (goal) node to the result list (only element)
-                cp.pathCost=currentNode.nodeValue; //The total cheapest path cost is the node value of the current/goal node
+                cp.pathCost=currentNode.getNodeValue(); //The total cheapest path cost is the node value of the current/goal node
                 while(currentNode!=startNode) { //While we're not back to the start node...
-                    System.out.println("While Looping");
+//                    System.out.println("While Looping");
                     boolean foundPrevPathNode=false; //Use a flag to identify when the previous path node is identified
                     for(GraphNode<?> n : encountered) { //For each node in the encountered list...
-                        System.out.println("For each node in encountered list");
+//                        System.out.println("For each node in encountered list");
 
                         for(int i=0;i<n.mat.nodeCount;i++) { //For each edge from that node...
-                            if (n.mat.amat[n.nodeId][i] > 0 && n.mat.nodes[i] == currentNode && currentNode.nodeValue - n.mat.amat[n.nodeId][i] == n.nodeValue) { //If that edge links to the
+                            System.out.println("For each edge from that node");
+                            if (n.mat.amat[n.nodeId][i] > 0 && n.mat.nodes[i] == currentNode && currentNode.getNodeValue()-n.mat.amat[n.nodeId][i] == n.getNodeValue()) { //If that edge links to the
                                 //current node and the difference in node values is the cost of the edge -> found path node!
                                 System.out.println("found path node");
                                 System.out.println("Cost: " + n.mat.amat[n.nodeId][i]);
@@ -303,18 +334,18 @@ public class PrimaryController {
                     }
                 }
                 //Reset the node values for all nodes to (effectively) infinity, so we can search again (leave no footprint!)
-                for(GraphNode<?> n : encountered) n.nodeValue=Integer.MAX_VALUE;
-                for(GraphNode<?> n : unencountered) n.nodeValue=Integer.MAX_VALUE;
+                for(GraphNode<?> n : encountered) n.setNodeValue(Integer.MAX_VALUE);
+                for(GraphNode<?> n : unencountered) n.setNodeValue(Integer.MAX_VALUE);
                 return cp; //The costed (cheapest) path has been assembled, so return it!
             }
             //We're not at the goal node yet, so...
             for(int i=0;i<currentNode.mat.nodeCount;i++) //For each edge/link from the current node...
                 if(!encountered.contains(currentNode.mat.nodes[i])) { //If the node it leads to has not yet been encountered (i.e. processed)
-                    currentNode.mat.nodes[i].nodeValue=Integer.min(currentNode.mat.nodes[i].nodeValue, currentNode.nodeValue+currentNode.mat.amat[currentNode.nodeId][i]); //Update the node value at the end
+                    currentNode.mat.nodes[i].nodeValue=Integer.min(currentNode.mat.nodes[i].getNodeValue(), currentNode.nodeValue+currentNode.mat.amat[currentNode.nodeId][i]); //Update the node value at the end
                     //of the edge to the minimum of its current value or the total of the current node's value plus the cost of the edge
                     if(!unencountered.contains(currentNode.mat.nodes[i])) unencountered.add(currentNode.mat.nodes[i]);
                 }
-            Collections.sort(unencountered, Comparator.comparingInt(n -> n.nodeValue)); //Sort in ascending node value order
+            Collections.sort(unencountered, Comparator.comparingInt(n -> n.getNodeValue())); //Sort in ascending node value order
         }while(!unencountered.isEmpty());
         return null; //No path found, so return null
     }

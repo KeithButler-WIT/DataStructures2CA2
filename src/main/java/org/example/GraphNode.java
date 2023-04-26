@@ -18,13 +18,21 @@ public class GraphNode<T> {
         mat.nodes[nodeId=mat.nodeCount++]=this; //Add this node to adjacency matrix and record id
     }
 
-    public void connectToNodeDirected(GraphNode<T> destNode, int cost) {
+    public void connectToNodeDirected(GraphNode<?> destNode, int cost) {
         mat.amat[nodeId][destNode.nodeId]=cost;
     }
 
     public void connectToNodeUndirected(GraphNode<?> destNode, int cost) {
         mat.amat[nodeId][destNode.nodeId]=mat.amat[destNode.nodeId][nodeId]=cost;
-        mat.amat[destNode.nodeId][nodeId]=mat.amat[nodeId][destNode.nodeId]=cost;
+//        mat.amat[destNode.nodeId][nodeId]=mat.amat[nodeId][destNode.nodeId]=cost;
+    }
+
+    public void setNodeValue(int value) {
+        mat.amat[nodeId][nodeId]=mat.amat[nodeId][nodeId]=value;
+    }
+
+    public int getNodeValue() {
+        return mat.amat[nodeId][nodeId]=mat.amat[nodeId][nodeId];
     }
 
     public void setMat(AdjacencyMatrix mat) {
