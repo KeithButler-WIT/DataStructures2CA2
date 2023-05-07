@@ -8,6 +8,7 @@ public class GraphNode<T> {
     private double latitude;
     private double longitude;
     private String stationName;
+//    private short zone;
 
     public GraphNode(short stationId, double latitude, double longitude, String stationName, AdjacencyMatrix mat){
         this.stationId=stationId;
@@ -28,11 +29,11 @@ public class GraphNode<T> {
     }
 
     public void setNodeValue(int value) {
-        mat.amat[nodeId][nodeId]=mat.amat[nodeId][nodeId]=value;
+        mat.amat[nodeId][nodeId]=value;
     }
 
     public int getNodeValue() {
-        return mat.amat[nodeId][nodeId]=mat.amat[nodeId][nodeId];
+        return mat.amat[nodeId][nodeId];
     }
 
     public void setMat(AdjacencyMatrix mat) {

@@ -4,14 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31b381fd-67d7-492e-952d-9fe49cb2f335" name="Changes" comment="added depth limit">
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/AdjacencyMatrixTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/org/example/GraphNodeTest.java" afterDir="false" />
+    <list default="true" id="31b381fd-67d7-492e-952d-9fe49cb2f335" name="Changes" comment="Waypoint system for fewest stations method">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/AdjacencyMatrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/AdjacencyMatrix.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/GraphNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/GraphNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/PrimaryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/PrimaryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/AdjacencyMatrixTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/example/AdjacencyMatrixTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/example/GraphNodeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/org/example/GraphNodeTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +173,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681399671734</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Waypoint system for fewest stations method">
+      <created>1682517347225</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1682517347225</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -186,7 +191,8 @@
     <MESSAGE value="added breath first search" />
     <MESSAGE value="added cli menu" />
     <MESSAGE value="added depth limit" />
-    <option name="LAST_COMMIT_MESSAGE" value="added depth limit" />
+    <MESSAGE value="Waypoint system for fewest stations method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Waypoint system for fewest stations method" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

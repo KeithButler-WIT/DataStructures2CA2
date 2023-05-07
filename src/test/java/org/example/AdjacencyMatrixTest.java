@@ -34,8 +34,4 @@ class AdjacencyMatrixTest {
         assertEquals(node1, am.getNodeFromStationId((short) 101));
         assertEquals(node2, am.getNodeFromStationId((short) 102));
     }
-
-    @Test
-    void getNodeValue() {
-    }
 }
